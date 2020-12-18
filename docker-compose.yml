@@ -3,6 +3,7 @@ version: '3'
 services:
   server:
     build: ./
+    restart: always
     ports:
       - '8080:8080'
     container_name: kinoapi
@@ -11,19 +12,22 @@ services:
       - /usr/src/app//node_modules
       # - ./src:/usr/app/
       # - /usr/app/node_modules
-  #   environment:
-  #     - SERVER_PORT=8080
-  #     - DATABASE_CONNECTIONSTRING=mongodb://db:27017/yoda_notes
-  #   depends_on:
-  #     - db
+    # environment:
+    #   - SERVER_PORT=8080
+    #   - DATABASE_CONNECTIONSTRING=mongodb://db:27017/kinoDB
+    # depends_on:
+    #   - mongo
+    links:
+      - mongo
 
-  # # docker run -it --rm -p 27017:27017 --name mongodb -v ~/projects/local_mongo/data/db:/data/db mongo
-  # db:
-  #   image: mongo:4.2.8a
-  #   container_name: db
-  #   # volumes:
-  #   #   - mongodb:/data/db
-  #   #   - mongodb_config:/data/configdb
-  #   ports:
-  #     - 27017:27017
-  #   command: mongod
+  # levantar mongo con docker
+  # docker run -it --rm -p 27017:27017 --name mongodb -v ~/projects/local_mongo/data/db:/data/db mongo
+  # docker run -d -p 27017:27017 --name mongodb -v ~/projects/local_mongo/data/db:/data/db mongo
+  mongo:
+    container_name: kinoDB
+    image: mongo:latest
+    restart: always
+    ports:
+      - '27017:27017'
+    logging:
+      driver: none

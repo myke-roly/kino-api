@@ -7,7 +7,7 @@ import { connectDB } from './db';
 
 import { authRouter, initialRoute } from './routes';
 
-// connectDB();
+connectDB();
 console.log('HELLO');
 dotenv.config();
 const app: Express = express();
