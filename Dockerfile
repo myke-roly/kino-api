@@ -15,11 +15,12 @@
 
 FROM node:12.18.3
 
+RUN mkdir -p ./
 WORKDIR /usr/src/app/
 
 
-COPY package.json package.json
-COPY package-lock.json package-lock.json
+COPY package.json ./
+COPY package-lock.json ./
 
 RUN npm install
 

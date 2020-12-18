@@ -1,6 +1,9 @@
 import { Response, Request } from 'express';
+import Axios, { AxiosResponse } from 'axios';
 
-export const signup = (_: Request, res: Response) => {
+export const signup = async (req: Request, res: Response) => {
+  console.log('assssssssssss', req.body);
+
   try {
     res.json({ message: 'Registrate' });
   } catch (err) {

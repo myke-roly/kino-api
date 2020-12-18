@@ -9,6 +9,8 @@ services:
     volumes:
       - .:/usr/src/app/
       - /usr/src/app//node_modules
+      # - ./src:/usr/app/
+      # - /usr/app/node_modules
   #   environment:
   #     - SERVER_PORT=8080
   #     - DATABASE_CONNECTIONSTRING=mongodb://db:27017/yoda_notes
