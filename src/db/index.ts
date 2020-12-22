@@ -1,7 +1,8 @@
 import { connect } from 'mongoose';
+import config from './config';
 
 export const connectDB = async (): Promise<any> => {
-  await connect('mongodb://mongo/kinodb', {
+  await connect(config.DB.URI_LOCAL, {
     useFindAndModify: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
