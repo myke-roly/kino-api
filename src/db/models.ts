@@ -1,12 +1,12 @@
-import { Schema, model, Document, Model, Query } from 'mongoose';
+import { Schema, model, Document, Model } from 'mongoose';
 import bcryptjs from 'bcryptjs';
 
 export interface UsersI {
   email: string;
   password: string;
   createAt?: string;
-  findUser(email: string): void;
   encryptPassword(password: string): string;
+  verifyPassword(password: string): Promise<boolean>;
 }
 
 interface UsersDocumentI extends UsersI, Document {}
@@ -29,23 +29,23 @@ const UsersSchema = new Schema({
   },
 });
 
+function encryptPassword(password: string): string {
+  const salt = bcryptjs.genSaltSync(10);
+
+  return bcryptjs.hashSync(password, salt);
+}
+
 UsersSchema.pre<UsersDocumentI>('save', function (next) {
   const user = this;
-  console.log(user);
   if (!this.isModified('password')) return next();
 
   user.password = encryptPassword(user.password);
   next();
 });
 
-function encryptPassword(password: string): string {
-  const salt = bcryptjs.genSaltSync(10);
-  console.log(typeof bcryptjs.hashSync(password, salt));
-  return bcryptjs.hashSync(password, salt);
-}
-
-UsersSchema.statics.findUser = (user: UsersModelI, email: string) => {
-  return user.findOne({ email });
+UsersSchema.methods.verifyPassword = async function (password: string): Promise<boolean> {
+  const user = this;
+  return await bcryptjs.compare(password, user.password);
 };
 
 const Users: UsersModelI = model<UsersDocumentI, UsersModelI>('Users', UsersSchema);

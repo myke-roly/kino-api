@@ -1,7 +1,6 @@
 import { Response, Request } from 'express';
 // import Axios, { AxiosResponse } from 'axios';
 import { Users, UsersDocumentI } from '../db/models';
-import jwt from 'jsonwebtoken';
 import { validateUser } from './helper';
 
 export const getUsers = async (_: Request, res: Response) => {
@@ -20,6 +19,8 @@ export const getUsers = async (_: Request, res: Response) => {
 
 export const signup = async (req: Request, res: Response) => {
   const { email, password } = req.body;
+  if (!email || !password) return;
+
   try {
     let user: UsersDocumentI = await Users.findOne({ email });
     if (user) {
@@ -29,14 +30,10 @@ export const signup = async (req: Request, res: Response) => {
     user = new Users({ email, password });
 
     const payload = { user: { id: user._id, email: user.email } };
-
     const EXPIRE_TOKEN: number = 15000;
     const token = validateUser(payload, process.env.JWT_SECRET, EXPIRE_TOKEN);
 
     res.json({ message: 'Usuario creado correctamente.', token });
-
-    // user.password = user.encryptPassword(password);
-    // Encript password
 
     await user.save();
   } catch (err) {
@@ -44,13 +41,30 @@ export const signup = async (req: Request, res: Response) => {
   }
 };
 
-export const signin = (_: Request, res: Response) => {
-  res.json({ message: 'Iniciar Sesion' });
+export const signin = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return;
+  }
+
+  try {
+    const user: UsersDocumentI = await Users.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'No existe un usuario con ese email.' });
+    }
+
+    const isMath = await user.verifyPassword(password);
+
+    if (!isMath) {
+      return res.status(403).json({ message: 'La contrasena es incorrecta' });
+    }
+
+    const payload = { user: { id: user._id, email: user.email } };
+    const EXPIRE_TOKEN: number = 15000;
+    const token = validateUser(payload, process.env.JWT_SECRET, EXPIRE_TOKEN);
+    return res.status(200).json({ message: 'Signin Success.', token });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
 };
-
-// async function findUser(this: UsersModelI, is: string): Promise<UsersDocumentI> {
-//   const user = await this.findOne({ email: 'mykeroly@gmail.com' });
-//   if (user) return user;
-
-//   return this.create();
-// }

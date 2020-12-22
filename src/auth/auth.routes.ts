@@ -6,4 +6,4 @@ export const route = Router();
 route.get('/signup', getUsers);
 route.post('/signup', signup);
 
-route.get('/sigin', signin);
+route.post('/signin', signin);
