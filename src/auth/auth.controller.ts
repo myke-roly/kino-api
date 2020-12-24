@@ -7,7 +7,7 @@ export const getUsers = async (_: Request, res: Response) => {
   try {
     const users = await Users.find();
     if (!users) {
-      return res.status(404).json({ message: 'no se encontro nigun usurio registrado' });
+      return res.status(404).json({ message: 'no se encontro ningun usuario registrado' });
     }
 
     res.status(200).json({ users });
@@ -25,6 +25,7 @@ export const signup = async (req: Request, res: Response) => {
     return res.status(403).json({ message: 'el email y la contrasena son obligatorios' });
   }
 
+  // TODO: enviar al email un diseno con el token en el boton
   // Create account to magic email (suspended for now)
   // const options = {
   //   to: email,
@@ -42,8 +43,7 @@ export const signup = async (req: Request, res: Response) => {
 
     const token = generateToken(user);
 
-    res.json({ message: 'Usuario creado correctamente.', token });
-    // TODO: enviar al email un diseno con el token en el boton
+    res.status(200).json({ message: 'Usuario creado correctamente.', token });
 
     await user.save();
   } catch (err) {
