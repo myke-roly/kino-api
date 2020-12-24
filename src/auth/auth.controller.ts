@@ -1,7 +1,7 @@
 import { Response, Request } from 'express';
-// import Axios, { AxiosResponse } from 'axios';
 import { Users, UsersDocumentI } from '../db/models';
-import { validateUser } from './helper';
+import { generateToken } from './helper';
+// import { sendRequestCreateAccount } from './mail';
 
 export const getUsers = async (_: Request, res: Response) => {
   try {
@@ -18,22 +18,32 @@ export const getUsers = async (_: Request, res: Response) => {
 };
 
 export const signup = async (req: Request, res: Response) => {
+  // validar email caracteres raros y seguridad
+
   const { email, password } = req.body;
-  if (!email || !password) return;
+  if (!email || !password) {
+    return res.status(403).json({ message: 'el email y la contrasena son obligatorios' });
+  }
+
+  // Create account to magic email (suspended for now)
+  // const options = {
+  //   to: email,
+  //   subject: 'Create a new account',
+  // };
+  // sendRequestCreateAccount(options).catch((err) => console.log(err));
 
   try {
     let user: UsersDocumentI = await Users.findOne({ email });
     if (user) {
-      return res.status(403).json({ message: 'ya exite un usuairio con ese email' });
+      return res.status(403).json({ message: 'ya exite un usuario con ese email' });
     }
 
     user = new Users({ email, password });
 
-    const payload = { user: { id: user._id, email: user.email } };
-    const EXPIRE_TOKEN: number = 15000;
-    const token = validateUser(payload, process.env.JWT_SECRET, EXPIRE_TOKEN);
+    const token = generateToken(user);
 
     res.json({ message: 'Usuario creado correctamente.', token });
+    // TODO: enviar al email un diseno con el token en el boton
 
     await user.save();
   } catch (err) {
@@ -44,7 +54,7 @@ export const signup = async (req: Request, res: Response) => {
 export const signin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return;
+    return res.status(400).json({ message: 'Los datos son obligatorios.' });
   }
 
   try {
@@ -56,12 +66,10 @@ export const signin = async (req: Request, res: Response) => {
     const isMath = await user.verifyPassword(password);
 
     if (!isMath) {
-      return res.status(403).json({ message: 'La contrasena es incorrecta' });
+      return res.status(403).json({ message: 'La contraseña es incorrecta' });
     }
 
-    const payload = { user: { id: user._id, email: user.email } };
-    const EXPIRE_TOKEN: number = 15000;
-    const token = validateUser(payload, process.env.JWT_SECRET, EXPIRE_TOKEN);
+    const token = generateToken(user);
     return res.status(200).json({ message: 'Signin Success.', token });
   } catch (error) {
     console.log(error);
