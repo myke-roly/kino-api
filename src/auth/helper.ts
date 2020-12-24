@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { UsersDocumentI } from '../db/models';
+import { UsersDocumentI } from './auth.model';
 
 export function generateToken(user: UsersDocumentI): string {
   const secretToken = process.env.JWT_SECRET;

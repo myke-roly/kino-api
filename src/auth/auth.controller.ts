@@ -1,5 +1,5 @@
 import { Response, Request } from 'express';
-import { Users, UsersDocumentI } from '../db/models';
+import { Users, UsersDocumentI } from './auth.model';
 import { generateToken } from './helper';
 // import { sendRequestCreateAccount } from './mail';
 
