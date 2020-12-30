@@ -7,7 +7,7 @@ dotenv.config();
 
 import { connectDB } from './db';
 
-import { authRouter, initialRoute } from './routes';
+import { authRouter, initialRoute, moviesRouter } from './routes';
 
 connectDB();
 const app: Express = express();
@@ -23,6 +23,8 @@ app.use(bodyParser.json());
 
 app.use('/', initialRoute);
 app.use('/auth', authRouter);
+
+app.use('/movies', moviesRouter);
 
 app.listen(PORT, () => {
   return console.log(`Server listen on port: ${PORT}`);

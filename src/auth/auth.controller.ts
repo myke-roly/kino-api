@@ -21,6 +21,7 @@ export const signup = async (req: Request, res: Response) => {
   // validar email caracteres raros y seguridad
 
   const { email, password } = req.body;
+  console.log('DATA: ',req.body)
   if (!email || !password) {
     return res.status(403).json({ message: 'el email y la contrasena son obligatorios' });
   }
